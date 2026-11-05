@@ -76,9 +76,32 @@ def log_action(action, name):
             "action": action,
             "name": name,
         })
-        
-            
-        
+    
+def report():
+    students = load_json()["students"]
+    if not students:
+        print("No students. ")
+        return
+    grades = [s["grade"]for s in students]
+    best = max(students, key= lambda s: s["grade"])
+    print(f"Students:   {len(students)}")
+    print(f"Average:    {sum(grades)/ len(grades):.1f}")
+    print(f"Top:        {best['name']} ({best['grade']})")
+    for s in sorted(students, key= lambda s:s["grade"], reverse=True):
+        print(f"    {s["name"]:<10} {s['grade']:>6} {', '.join(s.get("courses", []))} ")
+                
+def export_csv(path = BASE/ "export.csf"):
+    students = load_json()["students"]
+    fields =  ["name", "age", "grade", "courses"]
+    with open(path, "w", newline="", encoding="utf-8")as f:
+        writer = csv.DictWriter(f, fieldnames= fields)
+        writer.writeheader()
+        for s in students:
+            row= dict(s)
+            row["courses"] = ";".join(s.get("courses",[]))
+            writer.writerow(row)
+    print("Exported: ",path)
+
 if __name__ == "__main__":
     write_sample_csv()
     students, errors = read_csv(STUDENTS_CSV)
@@ -86,4 +109,5 @@ if __name__ == "__main__":
     print(load_json())
     print(students)
     add_student("Sofia", 20, 93, ["CS101", "MATH201"])
+    print(report())
     print("Skipped:", errors)

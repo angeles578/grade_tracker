@@ -24,9 +24,23 @@ def write_sample_csv():
         writer.writeheader()
         writer.writerows(rows)
         
-        
+def read_csv(path):
+    students, errors = [], []
+    with open (path, newline="", encoding="utf-8") as f:
+        for line_no, row in enumerate(csv.DictReader(f), start=2):
+            try:
+                students.append({
+                    "name": row["name"].strip(),
+                    "age": int(row["age"]),
+                    "grade": float(row["grade"]),
+                })
+            except (ValueError, KeyError) as e:
+                errors.append((line_no, row, str(e)))
+    return students, errors
         
         
 if __name__ == "__main__":
     write_sample_csv()
-    print("Created:", STUDENTS_CSV)
+    students, errors = read_csv(STUDENTS_CSV)
+    print(students)
+    print("Skipped:", errors)

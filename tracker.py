@@ -61,6 +61,10 @@ def add_student(name, age, grade, courses=None):
         "grade": grade,
         "courses": courses or [],
     })
+    
+    if any(s["name"].lower() == name.lower() for s in data["students"]):
+        print(f"{name} already exists. ")
+        return
     save_json(students)
     log_action("add", name)
     
@@ -84,9 +88,9 @@ def report():
         return
     grades = [s["grade"]for s in students]
     best = max(students, key= lambda s: s["grade"])
-    print(f"Students:   {len(students)}")
+    print(f"\nStudents:   {len(students)}")
     print(f"Average:    {sum(grades)/ len(grades):.1f}")
-    print(f"Top:        {best['name']} ({best['grade']})")
+    print(f"Top:        {best['name']} ({best['grade']})\n")
     for s in sorted(students, key= lambda s:s["grade"], reverse=True):
         print(f"    {s["name"]:<10} {s['grade']:>6} {', '.join(s.get("courses", []))} ")
                 
@@ -105,7 +109,7 @@ def export_csv(path = BASE/ "export.csf"):
 def menu():
     while True:
         print("\n1) Import CSV \n2) Add Student \n3) Report \n4) Export CSV \n5) Quit")
-        choice = input("> ").strip()
+        choice = input("\n> ").strip()
         
         if choice == "1":
             students, errors = read_csv(STUDENTS_CSV)

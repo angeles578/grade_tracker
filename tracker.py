@@ -102,12 +102,42 @@ def export_csv(path = BASE/ "export.csf"):
             writer.writerow(row)
     print("Exported: ",path)
 
+def menu():
+    while True:
+        print("\n1) Import CSV \n2) Add Student \n3) Report \n4) Export CSV \n5) Quit")
+        choice = input("> ").strip()
+        
+        if choice == "1":
+            students, errors = read_csv(STUDENTS_CSV)
+            for s in students:
+                s["courses"] = []
+            save_json(students)
+            print(f"Imported {len(students)}, skipped {len(errors)}")
+            
+        elif choice == '2':
+            try:
+                name = input("Name: ").strip()
+                age = int(input("Age: "))
+                grade = float(input("Grade: "))
+                raw = input("Courses (comma separated): ")
+                courses = [c.strip() for c in raw.split(",") if c.strip()]
+                add_student(name, age, grade, courses)        
+            except ValueError:
+                print("Age and grade must be numbers. ")
+                
+        elif choice == "3":    
+            report()
+        
+        elif choice == "4":
+            export_csv()
+            
+        elif choice == "5":
+            print("Bye! ")
+            break
+
 if __name__ == "__main__":
-    write_sample_csv()
-    students, errors = read_csv(STUDENTS_CSV)
-    save_json(students)
-    print(load_json())
-    print(students)
-    add_student("Sofia", 20, 93, ["CS101", "MATH201"])
-    print(report())
-    print("Skipped:", errors)
+    if not STUDENTS_CSV.exists():
+        write_sample_csv()
+    
+    print("Welcome to the student registration system! ")
+    menu()
